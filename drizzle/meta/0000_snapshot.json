@@ -1,0 +1,721 @@
+{
+  "id": "a75bc5d5-cdf7-461c-9e26-8bbc02511ca6",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.clients": {
+      "name": "clients",
+      "schema": "",
+      "columns": {
+        "cli_id": {
+          "name": "cli_id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cli_user_id": {
+          "name": "cli_user_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cli_name": {
+          "name": "cli_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cli_email": {
+          "name": "cli_email",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cli_phone": {
+          "name": "cli_phone",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cli_created_at": {
+          "name": "cli_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.mechanics": {
+      "name": "mechanics",
+      "schema": "",
+      "columns": {
+        "mec_id": {
+          "name": "mec_id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "mec_user_id": {
+          "name": "mec_user_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mec_name": {
+          "name": "mec_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mec_address": {
+          "name": "mec_address",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mec_email": {
+          "name": "mec_email",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mec_phone": {
+          "name": "mec_phone",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mec_identification_number": {
+          "name": "mec_identification_number",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mec_status": {
+          "name": "mec_status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mec_created_at": {
+          "name": "mec_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "mechanics_mec_identification_number_unique": {
+          "name": "mechanics_mec_identification_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mec_identification_number"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.service_categories": {
+      "name": "service_categories",
+      "schema": "",
+      "columns": {
+        "sct_id": {
+          "name": "sct_id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "sct_user_id": {
+          "name": "sct_user_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sct_name": {
+          "name": "sct_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sct_created_at": {
+          "name": "sct_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.services": {
+      "name": "services",
+      "schema": "",
+      "columns": {
+        "srv_id": {
+          "name": "srv_id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "srv_user_id": {
+          "name": "srv_user_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "srv_category_id": {
+          "name": "srv_category_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "srv_name": {
+          "name": "srv_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "srv_description": {
+          "name": "srv_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "srv_status": {
+          "name": "srv_status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "srv_created_at": {
+          "name": "srv_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "services_srv_category_id_service_categories_sct_id_fk": {
+          "name": "services_srv_category_id_service_categories_sct_id_fk",
+          "tableFrom": "services",
+          "tableTo": "service_categories",
+          "columnsFrom": [
+            "srv_category_id"
+          ],
+          "columnsTo": [
+            "sct_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.service_prices": {
+      "name": "service_prices",
+      "schema": "",
+      "columns": {
+        "srp_id": {
+          "name": "srp_id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "srp_service_id": {
+          "name": "srp_service_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "srp_price": {
+          "name": "srp_price",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "srp_estimated_hourly_rate": {
+          "name": "srp_estimated_hourly_rate",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "srp_currency": {
+          "name": "srp_currency",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'CLP'"
+        },
+        "srp_is_current": {
+          "name": "srp_is_current",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "srp_created_at": {
+          "name": "srp_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "service_prices_srp_service_id_services_srv_id_fk": {
+          "name": "service_prices_srp_service_id_services_srv_id_fk",
+          "tableFrom": "service_prices",
+          "tableTo": "services",
+          "columnsFrom": [
+            "srp_service_id"
+          ],
+          "columnsTo": [
+            "srv_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.work_orders": {
+      "name": "work_orders",
+      "schema": "",
+      "columns": {
+        "wor_id": {
+          "name": "wor_id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "wor_user_id": {
+          "name": "wor_user_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wor_code": {
+          "name": "wor_code",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wor_client_id": {
+          "name": "wor_client_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wor_mechanic_id": {
+          "name": "wor_mechanic_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wor_vehicle_plate": {
+          "name": "wor_vehicle_plate",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wor_maintenance_type": {
+          "name": "wor_maintenance_type",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wor_status": {
+          "name": "wor_status",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wor_created_at": {
+          "name": "wor_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "work_orders_wor_client_id_clients_cli_id_fk": {
+          "name": "work_orders_wor_client_id_clients_cli_id_fk",
+          "tableFrom": "work_orders",
+          "tableTo": "clients",
+          "columnsFrom": [
+            "wor_client_id"
+          ],
+          "columnsTo": [
+            "cli_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "work_orders_wor_mechanic_id_mechanics_mec_id_fk": {
+          "name": "work_orders_wor_mechanic_id_mechanics_mec_id_fk",
+          "tableFrom": "work_orders",
+          "tableTo": "mechanics",
+          "columnsFrom": [
+            "wor_mechanic_id"
+          ],
+          "columnsTo": [
+            "mec_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "work_orders_wor_code_unique": {
+          "name": "work_orders_wor_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "wor_code"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.work_order_services": {
+      "name": "work_order_services",
+      "schema": "",
+      "columns": {
+        "wos_id": {
+          "name": "wos_id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "wos_work_order_id": {
+          "name": "wos_work_order_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wos_service_id": {
+          "name": "wos_service_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wos_description": {
+          "name": "wos_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wos_hours_worked": {
+          "name": "wos_hours_worked",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wos_estimated_hourly_rate": {
+          "name": "wos_estimated_hourly_rate",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wos_actual_hourly_rate": {
+          "name": "wos_actual_hourly_rate",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wos_discount": {
+          "name": "wos_discount",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wos_created_at": {
+          "name": "wos_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "work_order_services_wos_work_order_id_work_orders_wor_id_fk": {
+          "name": "work_order_services_wos_work_order_id_work_orders_wor_id_fk",
+          "tableFrom": "work_order_services",
+          "tableTo": "work_orders",
+          "columnsFrom": [
+            "wos_work_order_id"
+          ],
+          "columnsTo": [
+            "wor_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "work_order_services_wos_service_id_services_srv_id_fk": {
+          "name": "work_order_services_wos_service_id_services_srv_id_fk",
+          "tableFrom": "work_order_services",
+          "tableTo": "services",
+          "columnsFrom": [
+            "wos_service_id"
+          ],
+          "columnsTo": [
+            "srv_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.spare_parts": {
+      "name": "spare_parts",
+      "schema": "",
+      "columns": {
+        "spr_id": {
+          "name": "spr_id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "spr_service_id": {
+          "name": "spr_service_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "spr_description": {
+          "name": "spr_description",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "spr_cost": {
+          "name": "spr_cost",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "spr_created_at": {
+          "name": "spr_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "spare_parts_spr_service_id_work_order_services_wos_id_fk": {
+          "name": "spare_parts_spr_service_id_work_order_services_wos_id_fk",
+          "tableFrom": "spare_parts",
+          "tableTo": "work_order_services",
+          "columnsFrom": [
+            "spr_service_id"
+          ],
+          "columnsTo": [
+            "wos_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.work_order_observations": {
+      "name": "work_order_observations",
+      "schema": "",
+      "columns": {
+        "woo_id": {
+          "name": "woo_id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "woo_work_order_id": {
+          "name": "woo_work_order_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "woo_author_type": {
+          "name": "woo_author_type",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "woo_author_name": {
+          "name": "woo_author_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "woo_content": {
+          "name": "woo_content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "woo_created_at": {
+          "name": "woo_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "work_order_observations_woo_work_order_id_work_orders_wor_id_fk": {
+          "name": "work_order_observations_woo_work_order_id_work_orders_wor_id_fk",
+          "tableFrom": "work_order_observations",
+          "tableTo": "work_orders",
+          "columnsFrom": [
+            "woo_work_order_id"
+          ],
+          "columnsTo": [
+            "wor_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.work_order_logs": {
+      "name": "work_order_logs",
+      "schema": "",
+      "columns": {
+        "wol_id": {
+          "name": "wol_id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "wol_work_order_id": {
+          "name": "wol_work_order_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wol_changed_by": {
+          "name": "wol_changed_by",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wol_changed_by_id": {
+          "name": "wol_changed_by_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wol_field": {
+          "name": "wol_field",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wol_old_value": {
+          "name": "wol_old_value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wol_new_value": {
+          "name": "wol_new_value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wol_created_at": {
+          "name": "wol_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "work_order_logs_wol_work_order_id_work_orders_wor_id_fk": {
+          "name": "work_order_logs_wol_work_order_id_work_orders_wor_id_fk",
+          "tableFrom": "work_order_logs",
+          "tableTo": "work_orders",
+          "columnsFrom": [
+            "wol_work_order_id"
+          ],
+          "columnsTo": [
+            "wor_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
