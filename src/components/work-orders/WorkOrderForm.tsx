@@ -19,7 +19,6 @@ import { createWorkOrderAction, updateWorkOrderAction } from '@/app/(dashboard)/
 import { type WorkOrderDetail } from '@/data/workOrders';
 
 const schema = z.object({
-  code: z.string().min(1).max(50),
   clientId: z.string().min(1),
   mechanicId: z.string().optional(),
   vehiclePlate: z.string().min(1).max(20),
@@ -50,7 +49,6 @@ export function WorkOrderForm({ isNew, workOrder, lookups, onSuccess }: WorkOrde
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      code: workOrder?.code ?? '',
       clientId: workOrder?.clientId ?? '',
       mechanicId: workOrder?.mechanicId ?? '',
       vehiclePlate: workOrder?.vehiclePlate ?? '',
@@ -77,22 +75,23 @@ export function WorkOrderForm({ isNew, workOrder, lookups, onSuccess }: WorkOrde
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <div className="space-y-2">
-        <Label htmlFor="code">{t('work_orders.field.code')}</Label>
-        <Input id="code" {...form.register('code')} />
-        {form.formState.errors.code && (
-          <p className="text-sm text-destructive">{form.formState.errors.code.message}</p>
-        )}
-      </div>
+      {!isNew && workOrder && (
+        <div className="space-y-2">
+          <Label htmlFor="workOrderId">{t('work_orders.field.id')}</Label>
+          <Input id="workOrderId" value={workOrder.id} disabled />
+        </div>
+      )}
 
       <div className="space-y-2">
         <Label htmlFor="clientId">{t('work_orders.field.client')}</Label>
         <Select
-          value={form.watch('clientId')}
+          value={form.watch('clientId') || undefined}
           onValueChange={(v) => form.setValue('clientId', v ?? '', { shouldValidate: true })}
         >
           <SelectTrigger id="clientId" className="w-full">
-            <SelectValue placeholder="Seleccionar..." />
+            <SelectValue placeholder="Seleccionar...">
+              {lookups.clients.find((c) => c.id === form.watch('clientId'))?.name}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {lookups.clients.map((c) => (
@@ -110,12 +109,12 @@ export function WorkOrderForm({ isNew, workOrder, lookups, onSuccess }: WorkOrde
       <div className="space-y-2">
         <Label htmlFor="mechanicId">{t('work_orders.field.mechanic')}</Label>
         <Select
-          value={form.watch('mechanicId') ?? ''}
+          value={form.watch('mechanicId') || undefined}
           onValueChange={(v) => form.setValue('mechanicId', v ?? undefined)}
         >
           <SelectTrigger id="mechanicId" className="w-full">
             <SelectValue placeholder="Seleccionar...">
-              {lookups.mechanics.find((m) => m.id === form.watch('mechanicId'))?.name ?? ''}
+              {lookups.mechanics.find((m) => m.id === form.watch('mechanicId'))?.name}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -131,11 +130,14 @@ export function WorkOrderForm({ isNew, workOrder, lookups, onSuccess }: WorkOrde
       <div className="space-y-2">
         <Label htmlFor="vehiclePlate">{t('work_orders.field.plate')}</Label>
         <Select
-          value={form.watch('vehiclePlate')}
+          value={form.watch('vehiclePlate') || undefined}
           onValueChange={(v) => form.setValue('vehiclePlate', v ?? '', { shouldValidate: true })}
         >
           <SelectTrigger id="vehiclePlate" className="w-full">
-            <SelectValue placeholder="Seleccionar..." />
+            <SelectValue placeholder="Seleccionar...">
+              {lookups.vehicles.find((v) => v.id === form.watch('vehiclePlate')) &&
+                `${form.watch('vehiclePlate')} — ${lookups.vehicles.find((v) => v.id === form.watch('vehiclePlate'))?.name}`}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {lookups.vehicles.map((v) => (
@@ -153,12 +155,12 @@ export function WorkOrderForm({ isNew, workOrder, lookups, onSuccess }: WorkOrde
       <div className="space-y-2">
         <Label htmlFor="maintenanceType">{t('work_orders.field.maintenance')}</Label>
         <Select
-          value={form.watch('maintenanceType')}
+          value={form.watch('maintenanceType') || undefined}
           onValueChange={(v) => form.setValue('maintenanceType', v ?? '', { shouldValidate: true })}
         >
           <SelectTrigger id="maintenanceType" className="w-full">
             <SelectValue placeholder="Seleccionar...">
-              {lookups.maintenanceTypes.find((m) => m.id === form.watch('maintenanceType'))?.name ?? ''}
+              {lookups.maintenanceTypes.find((m) => m.id === form.watch('maintenanceType'))?.name}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -177,12 +179,12 @@ export function WorkOrderForm({ isNew, workOrder, lookups, onSuccess }: WorkOrde
       <div className="space-y-2">
         <Label htmlFor="status">{t('work_orders.field.status')}</Label>
         <Select
-          value={form.watch('status')}
+          value={form.watch('status') || undefined}
           onValueChange={(v) => form.setValue('status', v ?? '', { shouldValidate: true })}
         >
           <SelectTrigger id="status" className="w-full">
             <SelectValue placeholder="Seleccionar...">
-              {lookups.statuses.find((s) => s.id === form.watch('status'))?.description ?? ''}
+              {lookups.statuses.find((s) => s.id === form.watch('status'))?.description}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>

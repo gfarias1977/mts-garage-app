@@ -16,5 +16,12 @@
       "tag": "0001_refactor_pks",
       "breakpoints": true
     }
+    ,{
+      "idx": 2,
+      "version": "7",
+      "when": 1744070400000,
+      "tag": "0002_nullable_work_order_code",
+      "breakpoints": true
+    }
   ]
 }

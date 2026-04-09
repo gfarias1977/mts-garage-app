@@ -25,9 +25,16 @@ import {
 
 const STATUS_LABELS: Record<string, string> = { A: 'Activo', I: 'Inactivo' };
 
+const numericFieldRegex = /^\d+(\.\d{1,2})?$/;
+
+const INCREMENTAL_OPTIONS = Array.from({ length: 21 }, (_, i) => String(i * 5));
+
 const schema = z.object({
   description: z.string().min(1).max(255),
-  cost: z.string().min(1).regex(/^\d+(\.\d{1,2})?$/, 'Ingrese un costo válido (ej: 1500.00)'),
+  cost: z.string().min(1).regex(numericFieldRegex, 'Ingrese un costo válido (ej: 1500.00)'),
+  incrementalPercentage: z.string().min(1),
+  adicionalCost: z.string().regex(numericFieldRegex, 'Ingrese un costo adicional válido (ej: 100.00)'),
+  totalCost: z.string().regex(numericFieldRegex, 'Ingrese un costo total válido (ej: 1600.00)'),
   status: z.string().min(1).max(1),
 });
 
@@ -54,12 +61,24 @@ export function WorkOrderServiceSparePartEditSheet({
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { description: '', cost: '', status: 'A' },
+    defaultValues: { description: '', cost: '', incrementalPercentage: '0', adicionalCost: '0.00', totalCost: '0.00', status: 'A' },
   });
+
+  const cost = form.watch('cost');
+  const incrementalPercentage = form.watch('incrementalPercentage');
+
+  useEffect(() => {
+    const costNum = parseFloat(cost) || 0;
+    const pctNum = parseFloat(incrementalPercentage) || 0;
+    const adicional = costNum * pctNum / 100;
+    const total = costNum + adicional;
+    form.setValue('adicionalCost', adicional.toFixed(2));
+    form.setValue('totalCost', total.toFixed(2));
+  }, [cost, incrementalPercentage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!open) return;
-    form.reset({ description: '', cost: '', status: 'A' });
+    form.reset({ description: '', cost: '', incrementalPercentage: '0', adicionalCost: '0.00', totalCost: '0.00', status: 'A' });
 
     if (id) {
       setLoading(true);
@@ -68,6 +87,9 @@ export function WorkOrderServiceSparePartEditSheet({
           form.reset({
             description: result.data.description,
             cost: result.data.cost,
+            incrementalPercentage: result.data.incrementalPercentage ?? '0',
+            adicionalCost: result.data.adicionalCost,
+            totalCost: result.data.totalCost,
             status: result.data.status,
           });
         }
@@ -81,6 +103,9 @@ export function WorkOrderServiceSparePartEditSheet({
       serviceId: workOrderServiceId,
       description: values.description,
       cost: values.cost,
+      incrementalPercentage: values.incrementalPercentage,
+      adicionalCost: values.adicionalCost,
+      totalCost: values.totalCost,
       status: values.status,
     };
 
@@ -139,6 +164,52 @@ export function WorkOrderServiceSparePartEditSheet({
               {form.formState.errors.cost && (
                 <p className="text-sm text-destructive">{form.formState.errors.cost.message}</p>
               )}
+            </div>
+
+            {/* Porcentaje Incremental */}
+            <div className="space-y-2">
+              <Label htmlFor="sspr-incremental-pct">{t('work_orders.spare_parts.field.incremental_percentage')}</Label>
+              <Select
+                value={form.watch('incrementalPercentage')}
+                onValueChange={(v) => form.setValue('incrementalPercentage', v, { shouldValidate: true })}
+              >
+                <SelectTrigger id="sspr-incremental-pct" className="w-full">
+                  <SelectValue placeholder="—">
+                    {form.watch('incrementalPercentage') !== ''
+                      ? `${form.watch('incrementalPercentage')}%`
+                      : undefined}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {INCREMENTAL_OPTIONS.map((v) => (
+                    <SelectItem key={v} value={v}>{v}%</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Costo Adicional (calculado) */}
+            <div className="space-y-2">
+              <Label htmlFor="sspr-additional-cost">{t('work_orders.spare_parts.field.additional_cost')}</Label>
+              <Input
+                id="sspr-additional-cost"
+                readOnly
+                tabIndex={-1}
+                className="bg-muted cursor-not-allowed"
+                {...form.register('adicionalCost')}
+              />
+            </div>
+
+            {/* Costo Total (calculado) */}
+            <div className="space-y-2">
+              <Label htmlFor="sspr-total-cost">{t('work_orders.spare_parts.field.total_cost')}</Label>
+              <Input
+                id="sspr-total-cost"
+                readOnly
+                tabIndex={-1}
+                className="bg-muted cursor-not-allowed"
+                {...form.register('totalCost')}
+              />
             </div>
 
             {/* Estado */}

@@ -107,7 +107,7 @@ export function WorkOrderServiceSparePartsModal({
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:w-auto sm:max-w-[90vw] max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {t('work_orders.spare_parts.title')}

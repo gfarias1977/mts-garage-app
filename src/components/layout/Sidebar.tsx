@@ -14,6 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Gauge,
+  ClipboardCheck,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLayoutStore } from '@/store/layout';
@@ -29,6 +31,7 @@ import {
 const nav = [
   {
     groupKey: 'nav.customers' as TranslationKey,
+    allowedRoles: ['org:admin'],
     items: [
       { key: 'nav.clients' as TranslationKey, href: '/clients', icon: Users },
       { key: 'nav.client_types' as TranslationKey, href: '/client-types', icon: UserCog },
@@ -37,6 +40,7 @@ const nav = [
   },
   {
     groupKey: 'nav.workshop' as TranslationKey,
+    allowedRoles: ['org:admin'],
     items: [
       { key: 'nav.work_orders' as TranslationKey, href: '/work-orders', icon: ClipboardList },
       { key: 'nav.mechanics' as TranslationKey, href: '/mechanics', icon: Wrench },
@@ -45,9 +49,31 @@ const nav = [
   },
   {
     groupKey: 'nav.services_group' as TranslationKey,
+    allowedRoles: ['org:admin'],
     items: [
       { key: 'nav.services' as TranslationKey, href: '/services', icon: Layers },
       { key: 'nav.service_categories' as TranslationKey, href: '/service-categories', icon: LayoutGrid },
+    ],
+  },
+  {
+    groupKey: 'nav.check_list' as TranslationKey,
+    allowedRoles: ['org:admin'],
+    items: [
+      { key: 'nav.check_list_garage' as TranslationKey, href: '/check-list-garage', icon: ClipboardCheck },
+    ],
+  },
+  {
+    groupKey: 'nav.reports' as TranslationKey,
+    allowedRoles: ['org:admin'],
+    items: [
+      { key: 'nav.tempario' as TranslationKey, href: '/tempario', icon: FileSpreadsheet },
+    ],
+  },
+  {
+    groupKey: 'nav.workshop_mechanic' as TranslationKey,
+    allowedRoles: ['org:member'],
+    items: [
+      { key: 'nav.work_orders_mechanic' as TranslationKey, href: '/work-orders-mechanic', icon: ClipboardList },
     ],
   },
 ];
@@ -92,7 +118,7 @@ function NavItem({
   return content;
 }
 
-export function Sidebar() {
+export function Sidebar({ role }: { role: string }) {
   const { collapsed, position, toggleCollapsed } = useLayoutStore();
   const { t } = useI18n();
   const pathname = usePathname();
@@ -100,6 +126,8 @@ export function Sidebar() {
   const router = useRouter();
   const isActive = (href: string) =>
     pathname === href || (href !== '/' && pathname.startsWith(href));
+
+  const visibleNav = nav.filter((group) => group.allowedRoles.includes(role));
 
   /* ── Top position: horizontal nav ─────────────────────────── */
   if (position === 'top') {
@@ -113,7 +141,7 @@ export function Sidebar() {
           <span className="text-sm">MTS Garage</span>
         </Link>
 
-        {nav.map((group) => (
+        {visibleNav.map((group) => (
           <DropdownMenu key={group.groupKey}>
             <DropdownMenuTrigger className="flex items-center gap-1 rounded px-3 py-1.5 text-sm text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] transition-colors">
               {t(group.groupKey)}
@@ -163,7 +191,7 @@ export function Sidebar() {
 
       {/* Nav groups */}
       <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-4">
-        {nav.map((group) => (
+        {visibleNav.map((group) => (
           <div key={group.groupKey}>
             {!collapsed && (
               <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--sidebar-text)] opacity-60">

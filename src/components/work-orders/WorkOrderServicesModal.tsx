@@ -101,7 +101,7 @@ export function WorkOrderServicesModal({ open, workOrderId, onClose }: WorkOrder
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:w-auto sm:max-w-[90vw] max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('work_orders.services.title')}</DialogTitle>
         </DialogHeader>

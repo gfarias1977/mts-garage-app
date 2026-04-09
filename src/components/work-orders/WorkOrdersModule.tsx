@@ -11,6 +11,7 @@ import { WorkOrderEditModal } from './WorkOrderEditModal';
 import { WorkOrderServicesModal } from './WorkOrderServicesModal';
 import { WorkOrderSparePartsModal } from './WorkOrderSparePartsModal';
 import { WorkOrderObservationsModal } from './WorkOrderObservationsModal';
+import { WorkOrderDiagnosisModal } from './WorkOrderDiagnosisModal';
 import { WorkOrderQuoteModal } from './WorkOrderQuoteModal';
 
 type ActiveModal =
@@ -19,6 +20,7 @@ type ActiveModal =
   | { type: 'services'; id: string }
   | { type: 'spareParts'; id: string }
   | { type: 'observations'; id: string }
+  | { type: 'diagnosis'; id: string }
   | { type: 'quote'; id: string }
   | null;
 
@@ -42,7 +44,7 @@ export function WorkOrdersModule({
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const searchParams = useSearchParams();
 
-  function handleAction(type: 'edit' | 'delete' | 'services' | 'spareParts' | 'observations' | 'quote', id: string) {
+  function handleAction(type: 'edit' | 'delete' | 'services' | 'spareParts' | 'observations' | 'diagnosis' | 'quote', id: string) {
     setActiveModal({ type, id } as ActiveModal);
   }
 
@@ -92,6 +94,11 @@ export function WorkOrdersModule({
       <WorkOrderObservationsModal
         open={activeModal?.type === 'observations'}
         workOrderId={activeModal?.type === 'observations' ? activeModal.id : ''}
+        onClose={() => setActiveModal(null)}
+      />
+      <WorkOrderDiagnosisModal
+        open={activeModal?.type === 'diagnosis'}
+        workOrderId={activeModal?.type === 'diagnosis' ? activeModal.id : ''}
         onClose={() => setActiveModal(null)}
       />
       <WorkOrderQuoteModal

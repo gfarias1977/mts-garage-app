@@ -66,7 +66,7 @@ export function WorkOrderEditModal({ open, id, onClose }: WorkOrderEditModalProp
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="sm:max-w-lg overflow-y-auto max-h-[90vh]">
+      <DialogContent className="sm:w-[41.6vw] sm:max-w-[41.6vw] max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isNew ? t('work_orders.new') : t('work_orders.edit_title')}

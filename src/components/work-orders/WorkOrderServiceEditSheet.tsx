@@ -20,6 +20,8 @@ import { useI18n } from '@/i18n';
 import {
   getWorkOrderServiceByIdAction,
   getServicesForSelectAction,
+  getServiceCategoriesForSelectAction,
+  getServiceCurrentPriceAction,
   createWorkOrderServiceAction,
   updateWorkOrderServiceAction,
 } from '@/app/(dashboard)/work-orders/actions';
@@ -71,45 +73,65 @@ export function WorkOrderServiceEditSheet({
 }: WorkOrderServiceEditSheetProps) {
   const { t } = useI18n();
   const [loading, setLoading] = useState(false);
-  const [services, setServices] = useState<{ id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [allServices, setAllServices] = useState<{ id: string; name: string; categoryId: string }[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const [categoryJustChanged, setCategoryJustChanged] = useState(false);
   const isNew = id === null;
+
+  const filteredServices = selectedCategoryId
+    ? allServices.filter((s) => s.categoryId === selectedCategoryId)
+    : [];
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues,
+    reValidateMode: 'onSubmit',
   });
 
   useEffect(() => {
     if (!open) return;
     form.reset(defaultValues);
+    setSelectedCategoryId('');
+    setCategoryJustChanged(false);
 
     setLoading(true);
-    const tasks: Promise<void>[] = [
-      getServicesForSelectAction().then((result) => {
-        if (result.success) setServices(result.data);
-      }),
+    const tasks: [
+      Promise<{ id: string; name: string }[]>,
+      Promise<{ id: string; name: string; categoryId: string }[]>,
+      Promise<string>,
+    ] = [
+      getServiceCategoriesForSelectAction().then((r) => (r.success ? r.data : [])),
+      getServicesForSelectAction().then((r) => (r.success ? r.data : [])),
+      id
+        ? getWorkOrderServiceByIdAction(id).then((r) => {
+            if (r.success && r.data) {
+              form.reset({
+                serviceId: r.data.serviceId,
+                note: r.data.note,
+                estimatedHourlyRate: r.data.estimatedHourlyRate ?? '',
+                estimatedPriceRate: r.data.estimatedPriceRate ?? '',
+                actualHourlyRate: r.data.actualHourlyRate ?? '',
+                actualPriceRate: r.data.actualPriceRate ?? '',
+                discount: r.data.discount ?? '',
+                status: r.data.status,
+              });
+              return r.data.serviceId;
+            }
+            return '';
+          })
+        : Promise.resolve(''),
     ];
 
-    if (id) {
-      tasks.push(
-        getWorkOrderServiceByIdAction(id).then((result) => {
-          if (result.success && result.data) {
-            form.reset({
-              serviceId: result.data.serviceId,
-              note: result.data.note,
-              estimatedHourlyRate: result.data.estimatedHourlyRate ?? '',
-              estimatedPriceRate: result.data.estimatedPriceRate ?? '',
-              actualHourlyRate: result.data.actualHourlyRate ?? '',
-              actualPriceRate: result.data.actualPriceRate ?? '',
-              discount: result.data.discount ?? '',
-              status: result.data.status,
-            });
-          }
-        }),
-      );
-    }
-
-    Promise.all(tasks).then(() => setLoading(false));
+    Promise.all(tasks).then(([cats, svcs, loadedServiceId]) => {
+      setCategories([...cats].sort((a, b) => a.name.localeCompare(b.name)));
+      setAllServices([...svcs].sort((a, b) => a.name.localeCompare(b.name)));
+      if (loadedServiceId) {
+        const cat = svcs.find((s) => s.id === loadedServiceId)?.categoryId ?? '';
+        setSelectedCategoryId(cat);
+      }
+      setLoading(false);
+    });
   }, [open, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function onSubmit(values: FormValues) {
@@ -169,25 +191,59 @@ export function WorkOrderServiceEditSheet({
 
         {!loading && (
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 p-4">
+            {/* Categoría */}
+            <div className="space-y-2">
+              <Label htmlFor="wos-category">{t('services.field.category')}</Label>
+              <Select
+                value={selectedCategoryId || undefined}
+                onValueChange={(v) => {
+                  setSelectedCategoryId(v ?? '');
+                  form.resetField('serviceId', { defaultValue: '' });
+                  form.clearErrors('serviceId');
+                  setCategoryJustChanged(true);
+                }}
+              >
+                <SelectTrigger id="wos-category" className="w-full">
+                  <SelectValue placeholder="—">
+                    {categories.find((c) => c.id === selectedCategoryId)?.name}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="w-full">
+                  {categories.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Servicio */}
             <div className="space-y-2">
               <Label htmlFor="wos-service">{t('work_orders.services.field.service')}</Label>
               <Select
-                value={form.watch('serviceId')}
-                onValueChange={(v) => form.setValue('serviceId', v ?? '', { shouldValidate: true })}
+                value={form.watch('serviceId') || undefined}
+                onValueChange={async (v) => {
+                  if (!v) return;
+                  setCategoryJustChanged(false);
+                  form.setValue('serviceId', v, { shouldValidate: true });
+                  const result = await getServiceCurrentPriceAction(v);
+                  if (result.success && result.data) {
+                    form.setValue('estimatedHourlyRate', result.data.estimatedHourlyRate ?? '');
+                    form.setValue('estimatedPriceRate', result.data.price);
+                  }
+                }}
               >
-                <SelectTrigger id="wos-service">
+                <SelectTrigger id="wos-service" className="w-full">
                   <SelectValue placeholder="—">
-                    {services.find((s) => s.id === form.watch('serviceId'))?.name ?? ''}
+                    {filteredServices.find((s) => s.id === form.watch('serviceId'))?.name}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
-                  {services.map((s) => (
+                <SelectContent className="w-full">
+                  {filteredServices.map((s) => (
                     <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {form.formState.errors.serviceId && (
+              {!categoryJustChanged && form.formState.errors.serviceId && (
                 <p className="text-sm text-destructive">{form.formState.errors.serviceId.message}</p>
               )}
             </div>

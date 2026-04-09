@@ -9,6 +9,9 @@ export type SparePartRow = {
   serviceName: string;
   description: string;
   cost: string;
+  adicionalCost: string;
+  incrementalPercentage: string;
+  totalCost: string;
   status: string;
   createdAt: Date | null;
   createdBy: string;
@@ -86,6 +89,8 @@ export async function getWorkOrderSparePartsPaged(params: {
         serviceName: servicesTable.name,
         description: sparePartsTable.description,
         cost: sparePartsTable.cost,
+        adicionalCost: sparePartsTable.adicionalCost,
+        totalCost: sparePartsTable.totalCost,
         status: sparePartsTable.status,
         createdAt: sparePartsTable.createdAt,
         createdBy: sparePartsTable.createdBy,
@@ -110,6 +115,8 @@ export async function getWorkOrderSparePartsPaged(params: {
       serviceName: row.serviceName ?? '',
       description: row.description,
       cost: row.cost,
+      adicionalCost: row.adicionalCost ?? '0',
+      totalCost: row.totalCost ?? '0',
       status: row.status,
       createdAt: row.createdAt,
       createdBy: row.createdBy,
@@ -130,6 +137,9 @@ export async function getWorkOrderSparePartById(id: bigint): Promise<SparePartRo
       serviceName: servicesTable.name,
       description: sparePartsTable.description,
       cost: sparePartsTable.cost,
+      adicionalCost: sparePartsTable.adicionalCost,
+      incrementalPercentage: sparePartsTable.incrementalPercentage,
+      totalCost: sparePartsTable.totalCost,
       status: sparePartsTable.status,
       createdAt: sparePartsTable.createdAt,
       createdBy: sparePartsTable.createdBy,
@@ -149,6 +159,9 @@ export async function getWorkOrderSparePartById(id: bigint): Promise<SparePartRo
     serviceName: row.serviceName ?? '',
     description: row.description,
     cost: row.cost,
+    adicionalCost: row.adicionalCost ?? '0',
+    incrementalPercentage: row.incrementalPercentage ?? '0',
+    totalCost: row.totalCost ?? '0',
     status: row.status,
     createdAt: row.createdAt,
     createdBy: row.createdBy,
@@ -161,6 +174,9 @@ export async function createWorkOrderSparePart(
     serviceId: bigint;
     description: string;
     cost: string;
+    adicionalCost: string;
+    incrementalPercentage: string;
+    totalCost: string;
     status: string;
     createdBy: string;
   },
@@ -179,6 +195,9 @@ export async function updateWorkOrderSparePart(
     serviceId?: bigint;
     description?: string;
     cost?: string;
+    adicionalCost?: string;
+    incrementalPercentage?: string;
+    totalCost?: string;
     status?: string;
   },
 ): Promise<void> {
@@ -234,6 +253,8 @@ export async function getSparePartsByWorkOrderServicePaged(params: {
         serviceName: servicesTable.name,
         description: sparePartsTable.description,
         cost: sparePartsTable.cost,
+        adicionalCost: sparePartsTable.adicionalCost,
+        totalCost: sparePartsTable.totalCost,
         status: sparePartsTable.status,
         createdAt: sparePartsTable.createdAt,
         createdBy: sparePartsTable.createdBy,
@@ -258,6 +279,8 @@ export async function getSparePartsByWorkOrderServicePaged(params: {
       serviceName: row.serviceName ?? '',
       description: row.description,
       cost: row.cost,
+      adicionalCost: row.adicionalCost ?? '0',
+      totalCost: row.totalCost ?? '0',
       status: row.status,
       createdAt: row.createdAt,
       createdBy: row.createdBy,

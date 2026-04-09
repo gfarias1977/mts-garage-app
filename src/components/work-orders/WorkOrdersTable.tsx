@@ -12,7 +12,7 @@ import { type WorkOrderRow, type SortColumn } from '@/data/workOrders';
 import { WorkOrderRowActions } from './WorkOrderRowActions';
 import { buildUrl } from './urlHelpers';
 
-type ActionType = 'edit' | 'delete' | 'services' | 'spareParts' | 'observations' | 'quote';
+type ActionType = 'edit' | 'delete' | 'services' | 'spareParts' | 'observations' | 'diagnosis' | 'quote';
 
 interface WorkOrdersTableProps {
   rows: WorkOrderRow[];

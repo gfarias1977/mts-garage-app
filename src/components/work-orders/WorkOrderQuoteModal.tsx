@@ -64,8 +64,8 @@ export function WorkOrderQuoteModal({ open, workOrderId, onClose }: WorkOrderQuo
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent
-        className="overflow-hidden"
-        style={{ width: '72vw', maxWidth: '72vw', height: '63vh', display: 'flex', flexDirection: 'column', padding: 0, gap: 0 }}
+        className="sm:max-w-[46vw] overflow-hidden"
+        style={{ width: '46vw', height: '90vh', display: 'flex', flexDirection: 'column', padding: 0, gap: 0 }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">

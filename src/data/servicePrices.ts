@@ -143,6 +143,26 @@ export async function getServicePriceById(
   };
 }
 
+export async function getServiceCurrentPrice(
+  serviceId: bigint,
+): Promise<{ price: string; estimatedHourlyRate: string | null } | null> {
+  const rows = await db
+    .select({
+      price: servicePricesTable.price,
+      estimatedHourlyRate: servicePricesTable.estimatedHourlyRate,
+    })
+    .from(servicePricesTable)
+    .where(eq(servicePricesTable.serviceId, serviceId))
+    .orderBy(desc(servicePricesTable.isCurrent), desc(servicePricesTable.createdAt))
+    .limit(1);
+
+  if (!rows[0]) return null;
+  return {
+    price: rows[0].price,
+    estimatedHourlyRate: rows[0].estimatedHourlyRate ?? null,
+  };
+}
+
 export async function createServicePrice(
   serviceId: bigint,
   input: {

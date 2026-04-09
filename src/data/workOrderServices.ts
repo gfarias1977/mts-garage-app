@@ -227,12 +227,12 @@ export async function deleteWorkOrderService(id: bigint): Promise<void> {
   await db.delete(workOrderServicesTable).where(eq(workOrderServicesTable.id, id));
 }
 
-export async function getServicesForSelect(userId: bigint): Promise<{ id: string; name: string }[]> {
+export async function getServicesForSelect(userId: bigint): Promise<{ id: string; name: string; categoryId: string }[]> {
   const rows = await db
-    .select({ id: servicesTable.id, name: servicesTable.name })
+    .select({ id: servicesTable.id, name: servicesTable.name, categoryId: servicesTable.categoryId })
     .from(servicesTable)
     .where(eq(servicesTable.userId, userId));
-  return rows.map((r) => ({ id: r.id.toString(), name: r.name }));
+  return rows.map((r) => ({ id: r.id.toString(), name: r.name, categoryId: r.categoryId.toString() }));
 }
 
 // Kept for backward compatibility

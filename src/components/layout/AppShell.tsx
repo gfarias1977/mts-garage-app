@@ -6,14 +6,14 @@ import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Footer } from './Footer';
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ children, role }: { children: React.ReactNode; role: string }) {
   const { position } = useLayoutStore();
 
   if (position === 'top') {
     return (
       <div className="flex flex-col h-screen overflow-hidden bg-background">
         <Header />
-        <Sidebar />
+        <Sidebar role={role} />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
         <Footer />
       </div>
@@ -27,7 +27,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         position === 'right' && 'flex-row-reverse',
       )}
     >
-      <Sidebar />
+      <Sidebar role={role} />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>

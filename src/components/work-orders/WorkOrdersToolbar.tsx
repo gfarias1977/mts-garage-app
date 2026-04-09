@@ -14,10 +14,11 @@ interface WorkOrdersToolbarProps {
   sortBy: SortColumn;
   sortDir: 'asc' | 'desc';
   searchParams: URLSearchParams;
-  onNew: () => void;
+  onNew?: () => void;
+  showNew?: boolean;
 }
 
-export function WorkOrdersToolbar({ search, searchParams, onNew }: WorkOrdersToolbarProps) {
+export function WorkOrdersToolbar({ search, searchParams, onNew, showNew = true }: WorkOrdersToolbarProps) {
   const { t } = useI18n();
   const router = useRouter();
   const [localSearch, setLocalSearch] = useState(search);
@@ -47,10 +48,12 @@ export function WorkOrdersToolbar({ search, searchParams, onNew }: WorkOrdersToo
         onChange={(e) => handleSearch(e.target.value)}
         className="h-9 w-64"
       />
-      <Button onClick={onNew} size="sm">
-        <PlusIcon className="size-4" />
-        {t('work_orders.new')}
-      </Button>
+      {showNew && (
+        <Button onClick={onNew} size="sm">
+          <PlusIcon className="size-4" />
+          {t('work_orders.new')}
+        </Button>
+      )}
     </div>
   );
 }

@@ -42,13 +42,25 @@ import {
   type ObservationSortColumn,
 } from '@/data/workOrderObservations';
 import {
+  getWorkOrderDiagnosisPaged,
+  getWorkOrderDiagnosisById,
+  createWorkOrderDiagnosis,
+  updateWorkOrderDiagnosis,
+  deleteWorkOrderDiagnosis,
+  type GetDiagnosisResult,
+  type DiagnosisRow,
+  type DiagnosisSortColumn,
+} from '@/data/workOrderDiagnosis';
+import {
   getClientsForSelect,
   getMechanicsForSelect,
   getVehiclesForSelect,
   getMaintenanceTypesForSelect,
   getStatusesForSelect,
+  getServiceCategoriesForSelect,
 } from '@/data/lookups';
 import { getWorkOrderQuoteData, type WorkOrderQuoteData } from '@/data/workOrderQuote';
+import { getServiceCurrentPrice } from '@/data/servicePrices';
 import { currentUser } from '@clerk/nextjs/server';
 
 type ActionResult<T = void> =
@@ -56,7 +68,6 @@ type ActionResult<T = void> =
   | { success: false; error: string };
 
 const workOrderSchema = z.object({
-  code: z.string().min(1).max(50),
   clientId: z.string().min(1),
   mechanicId: z.string().optional(),
   vehiclePlate: z.string().min(1).max(20),
@@ -90,6 +101,7 @@ export async function createWorkOrderAction(
     const { user, displayName } = await resolveUser();
     const result = await createWorkOrder(user.id, {
       ...parsed.data,
+      code: null,
       createdBy: displayName,
     });
     revalidatePath('/work-orders');
@@ -292,10 +304,17 @@ export async function deleteWorkOrderObservationAction(id: string): Promise<Acti
 
 // ── Spare Parts ────────────────────────────────────────────────────────────────
 
+const numericFieldRegex = /^\d+(\.\d{1,2})?$/;
+
+const INCREMENTAL_PERCENTAGE_VALUES = ['0','5','10','15','20','25','30','35','40','45','50','55','60','65','70','75','80','85','90','95','100'] as const;
+
 const sparePartSchema = z.object({
   serviceId: z.string().min(1),
   description: z.string().min(1).max(255),
-  cost: z.string().min(1).regex(/^\d+(\.\d{1,2})?$/, 'Ingrese un costo válido (ej: 1500.00)'),
+  cost: z.string().min(1).regex(numericFieldRegex, 'Ingrese un costo válido (ej: 1500.00)'),
+  adicionalCost: z.string().regex(numericFieldRegex, 'Ingrese un costo adicional válido (ej: 100.00)'),
+  incrementalPercentage: z.enum(INCREMENTAL_PERCENTAGE_VALUES),
+  totalCost: z.string().regex(numericFieldRegex, 'Ingrese un costo total válido (ej: 1600.00)'),
   status: z.string().min(1).max(1),
 });
 
@@ -360,6 +379,9 @@ export async function createWorkOrderSparePartAction(
       serviceId: BigInt(parsed.data.serviceId),
       description: parsed.data.description,
       cost: parsed.data.cost,
+      adicionalCost: parsed.data.adicionalCost,
+      incrementalPercentage: parsed.data.incrementalPercentage,
+      totalCost: parsed.data.totalCost,
       status: parsed.data.status,
       createdBy: displayName,
     });
@@ -383,6 +405,9 @@ export async function updateWorkOrderSparePartAction(
       serviceId: BigInt(parsed.data.serviceId),
       description: parsed.data.description,
       cost: parsed.data.cost,
+      adicionalCost: parsed.data.adicionalCost,
+      incrementalPercentage: parsed.data.incrementalPercentage,
+      totalCost: parsed.data.totalCost,
       status: parsed.data.status,
     });
     revalidatePath('/work-orders');
@@ -483,11 +508,35 @@ export async function getWorkOrderServiceByIdAction(
 }
 
 export async function getServicesForSelectAction(): Promise<
-  ActionResult<{ id: string; name: string }[]>
+  ActionResult<{ id: string; name: string; categoryId: string }[]>
 > {
   try {
     const { user } = await resolveUser();
     const data = await getServicesForSelect(user.id);
+    return { success: true, data };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
+  }
+}
+
+export async function getServiceCategoriesForSelectAction(): Promise<
+  ActionResult<{ id: string; name: string }[]>
+> {
+  try {
+    const { user } = await resolveUser();
+    const data = await getServiceCategoriesForSelect(user.id);
+    return { success: true, data };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
+  }
+}
+
+export async function getServiceCurrentPriceAction(
+  serviceId: string,
+): Promise<ActionResult<{ price: string; estimatedHourlyRate: string | null } | null>> {
+  try {
+    await resolveUser();
+    const data = await getServiceCurrentPrice(BigInt(serviceId));
     return { success: true, data };
   } catch (e) {
     return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
@@ -574,6 +623,97 @@ export async function getWorkOrderQuoteDataAction(
       ? [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ')
       : quoteData.createdBy;
     return { success: true, data: { quoteData, sellerName } };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
+  }
+}
+
+// ── Diagnosis ──────────────────────────────────────────────────────────────
+
+const diagnosisSchema = z.object({
+  authorName: z.string().min(1).max(100),
+  content: z.string().min(1),
+});
+
+export async function getWorkOrderDiagnosisPagedAction(input: {
+  workOrderId: string;
+  page: number;
+  pageSize: number;
+  search: string;
+  sortBy: DiagnosisSortColumn;
+  sortDir: 'asc' | 'desc';
+}): Promise<ActionResult<GetDiagnosisResult>> {
+  try {
+    await resolveUser();
+    const data = await getWorkOrderDiagnosisPaged({
+      workOrderId: BigInt(input.workOrderId),
+      search: input.search || undefined,
+      sortBy: input.sortBy,
+      sortDir: input.sortDir,
+      page: input.page,
+      pageSize: input.pageSize,
+    });
+    return { success: true, data };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
+  }
+}
+
+export async function getWorkOrderDiagnosisByIdAction(
+  id: string,
+): Promise<ActionResult<DiagnosisRow | null>> {
+  try {
+    await resolveUser();
+    const data = await getWorkOrderDiagnosisById(BigInt(id));
+    return { success: true, data };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
+  }
+}
+
+export async function createWorkOrderDiagnosisAction(
+  workOrderId: string,
+  input: z.infer<typeof diagnosisSchema>,
+): Promise<ActionResult<{ id: string }>> {
+  const parsed = diagnosisSchema.safeParse(input);
+  if (!parsed.success) return { success: false, error: parsed.error.message };
+
+  try {
+    const { displayName } = await resolveUser();
+    const data = await createWorkOrderDiagnosis(BigInt(workOrderId), {
+      ...parsed.data,
+      createdBy: displayName,
+    });
+    revalidatePath('/work-orders');
+    return { success: true, data };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
+  }
+}
+
+export async function updateWorkOrderDiagnosisAction(
+  id: string,
+  input: z.infer<typeof diagnosisSchema>,
+): Promise<ActionResult> {
+  const parsed = diagnosisSchema.safeParse(input);
+  if (!parsed.success) return { success: false, error: parsed.error.message };
+
+  try {
+    await resolveUser();
+    await updateWorkOrderDiagnosis(BigInt(id), parsed.data);
+    revalidatePath('/work-orders');
+    return { success: true, data: undefined };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
+  }
+}
+
+export async function deleteWorkOrderDiagnosisAction(id: string): Promise<ActionResult> {
+  try {
+    await resolveUser();
+    await deleteWorkOrderDiagnosis(BigInt(id));
+    revalidatePath('/work-orders');
+    return { success: true, data: undefined };
   } catch (e) {
     return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
   }

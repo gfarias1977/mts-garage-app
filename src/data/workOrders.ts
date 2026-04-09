@@ -6,6 +6,12 @@ import {
   vehiclesTable,
   maintenanceTypesTable,
   workOrdersStatusTable,
+  sparePartsTable,
+  workOrderServicesTable,
+  workOrderDiagnosisTable,
+  workOrderObservationsTable,
+  workOrderLogsTable,
+  checkListGarageWorkOrdersTable,
 } from '@/db/schema';
 import { and, asc, desc, eq, ilike, or, sql } from 'drizzle-orm';
 
@@ -195,7 +201,7 @@ export async function getWorkOrderById(
 export async function createWorkOrder(
   userId: bigint,
   input: {
-    code: string;
+    code?: string | null;
     clientId: string;
     mechanicId?: string;
     vehiclePlate: string;
@@ -208,7 +214,7 @@ export async function createWorkOrder(
     .insert(workOrdersTable)
     .values({
       userId,
-      code: input.code,
+      code: input.code ?? null,
       clientId: input.clientId,
       mechanicId: input.mechanicId ?? null,
       vehiclePlate: input.vehiclePlate,
@@ -240,6 +246,12 @@ export async function updateWorkOrder(
 }
 
 export async function deleteWorkOrder(id: bigint, userId: bigint): Promise<void> {
+  await db.delete(sparePartsTable).where(eq(sparePartsTable.workOrderId, id));
+  await db.delete(workOrderServicesTable).where(eq(workOrderServicesTable.workOrderId, id));
+  await db.delete(workOrderDiagnosisTable).where(eq(workOrderDiagnosisTable.workOrderId, id));
+  await db.delete(workOrderObservationsTable).where(eq(workOrderObservationsTable.workOrderId, id));
+  await db.delete(workOrderLogsTable).where(eq(workOrderLogsTable.workOrderId, id));
+  await db.delete(checkListGarageWorkOrdersTable).where(eq(checkListGarageWorkOrdersTable.workOrderId, id));
   await db
     .delete(workOrdersTable)
     .where(and(eq(workOrdersTable.id, id), eq(workOrdersTable.userId, userId)));

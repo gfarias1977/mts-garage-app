@@ -8,7 +8,7 @@ import { workOrdersStatusTable } from './workOrdersStatus';
 export const workOrdersTable = pgTable('work_orders', {
   id: bigserial('wor_id', { mode: 'bigint' }).primaryKey(),
   userId: bigint('wor_user_id', { mode: 'bigint' }).notNull(),
-  code: varchar('wor_code', { length: 50 }).notNull().unique(),
+  code: varchar('wor_code', { length: 50 }).unique(),
   clientId: varchar('wor_cli_id', { length: 10 })
     .notNull()
     .references(() => clientsTable.id),

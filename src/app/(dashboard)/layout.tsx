@@ -9,9 +9,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const client = await clerkClient();
   const memberships = await client.users.getOrganizationMembershipList({ userId });
-  const isOrgAdmin = memberships.data.some((m) => m.role === 'org:admin');
+  const role = memberships.data.find(
+    (m) => m.role === 'org:admin' || m.role === 'org:member',
+  )?.role ?? null;
 
-  if (!isOrgAdmin) redirect('/unauthorized');
+  if (!role) redirect('/unauthorized');
 
-  return <AppShell>{children}</AppShell>;
+  return <AppShell role={role}>{children}</AppShell>;
 }

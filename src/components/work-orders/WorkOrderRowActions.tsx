@@ -1,9 +1,9 @@
 'use client';
 
-import { Pencil, Trash2, Wrench, Package, Eye, FileText } from 'lucide-react';
+import { Pencil, Trash2, Wrench, Package, Eye, FileText, Stethoscope } from 'lucide-react';
 import { useI18n } from '@/i18n';
 
-type ActionType = 'edit' | 'delete' | 'services' | 'spareParts' | 'observations' | 'quote';
+type ActionType = 'edit' | 'delete' | 'services' | 'spareParts' | 'observations' | 'diagnosis' | 'quote';
 
 interface WorkOrderRowActionsProps {
   id: string;
@@ -49,6 +49,13 @@ export function WorkOrderRowActions({ id, onAction }: WorkOrderRowActionsProps) 
         onClick={() => onAction('observations', id)}
       >
         <Eye size={15} />
+      </button>
+      <button
+        className="rounded p-1 hover:bg-muted transition-colors"
+        title={t('work_orders.view_diagnosis')}
+        onClick={() => onAction('diagnosis', id)}
+      >
+        <Stethoscope size={15} />
       </button>
       <button
         className="rounded p-1 hover:bg-muted transition-colors"
