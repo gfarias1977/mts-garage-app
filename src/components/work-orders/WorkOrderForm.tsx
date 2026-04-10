@@ -85,7 +85,7 @@ export function WorkOrderForm({ isNew, workOrder, lookups, onSuccess }: WorkOrde
       <div className="space-y-2">
         <Label htmlFor="clientId">{t('work_orders.field.client')}</Label>
         <Select
-          value={form.watch('clientId') || undefined}
+          value={form.watch('clientId')}
           onValueChange={(v) => form.setValue('clientId', v ?? '', { shouldValidate: true })}
         >
           <SelectTrigger id="clientId" className="w-full">
@@ -109,7 +109,7 @@ export function WorkOrderForm({ isNew, workOrder, lookups, onSuccess }: WorkOrde
       <div className="space-y-2">
         <Label htmlFor="mechanicId">{t('work_orders.field.mechanic')}</Label>
         <Select
-          value={form.watch('mechanicId') || undefined}
+          value={form.watch('mechanicId') ?? ''}
           onValueChange={(v) => form.setValue('mechanicId', v ?? undefined)}
         >
           <SelectTrigger id="mechanicId" className="w-full">
@@ -130,7 +130,7 @@ export function WorkOrderForm({ isNew, workOrder, lookups, onSuccess }: WorkOrde
       <div className="space-y-2">
         <Label htmlFor="vehiclePlate">{t('work_orders.field.plate')}</Label>
         <Select
-          value={form.watch('vehiclePlate') || undefined}
+          value={form.watch('vehiclePlate')}
           onValueChange={(v) => form.setValue('vehiclePlate', v ?? '', { shouldValidate: true })}
         >
           <SelectTrigger id="vehiclePlate" className="w-full">
@@ -155,7 +155,7 @@ export function WorkOrderForm({ isNew, workOrder, lookups, onSuccess }: WorkOrde
       <div className="space-y-2">
         <Label htmlFor="maintenanceType">{t('work_orders.field.maintenance')}</Label>
         <Select
-          value={form.watch('maintenanceType') || undefined}
+          value={form.watch('maintenanceType')}
           onValueChange={(v) => form.setValue('maintenanceType', v ?? '', { shouldValidate: true })}
         >
           <SelectTrigger id="maintenanceType" className="w-full">
@@ -179,7 +179,7 @@ export function WorkOrderForm({ isNew, workOrder, lookups, onSuccess }: WorkOrde
       <div className="space-y-2">
         <Label htmlFor="status">{t('work_orders.field.status')}</Label>
         <Select
-          value={form.watch('status') || undefined}
+          value={form.watch('status')}
           onValueChange={(v) => form.setValue('status', v ?? '', { shouldValidate: true })}
         >
           <SelectTrigger id="status" className="w-full">

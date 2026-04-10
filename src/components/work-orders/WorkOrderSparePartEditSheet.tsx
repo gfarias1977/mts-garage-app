@@ -149,7 +149,7 @@ export function WorkOrderSparePartEditSheet({
             <div className="space-y-2">
               <Label htmlFor="spr-service">{t('work_orders.spare_parts.field.service')}</Label>
               <Select
-                value={form.watch('serviceId') || undefined}
+                value={form.watch('serviceId')}
                 onValueChange={(v) => form.setValue('serviceId', v ?? '', { shouldValidate: true })}
               >
                 <SelectTrigger id="spr-service">

@@ -154,16 +154,25 @@ export function WorkOrderServiceEditSheet({
     name,
     label,
     id: fieldId,
+    readOnly = false,
   }: {
     name: keyof FormValues;
     label: string;
     id: string;
+    readOnly?: boolean;
   }) {
     return (
       <div className="space-y-2">
         <Label htmlFor={fieldId}>{label}</Label>
-        <Input id={fieldId} placeholder="0.00" {...form.register(name)} />
-        {form.formState.errors[name] && (
+        <Input
+          id={fieldId}
+          placeholder="0.00"
+          readOnly={readOnly}
+          tabIndex={readOnly ? -1 : undefined}
+          className={readOnly ? 'bg-muted cursor-not-allowed' : undefined}
+          {...form.register(name)}
+        />
+        {!readOnly && form.formState.errors[name] && (
           <p className="text-sm text-destructive">
             {form.formState.errors[name]?.message as string}
           </p>
@@ -195,7 +204,7 @@ export function WorkOrderServiceEditSheet({
             <div className="space-y-2">
               <Label htmlFor="wos-category">{t('services.field.category')}</Label>
               <Select
-                value={selectedCategoryId || undefined}
+                value={selectedCategoryId}
                 onValueChange={(v) => {
                   setSelectedCategoryId(v ?? '');
                   form.resetField('serviceId', { defaultValue: '' });
@@ -220,7 +229,7 @@ export function WorkOrderServiceEditSheet({
             <div className="space-y-2">
               <Label htmlFor="wos-service">{t('work_orders.services.field.service')}</Label>
               <Select
-                value={form.watch('serviceId') || undefined}
+                value={form.watch('serviceId')}
                 onValueChange={async (v) => {
                   if (!v) return;
                   setCategoryJustChanged(false);
@@ -265,6 +274,7 @@ export function WorkOrderServiceEditSheet({
                 name="estimatedHourlyRate"
                 label={t('work_orders.services.field.est_hourly')}
                 id="wos-est-hourly"
+                readOnly
               />
               <NumericField
                 name="actualHourlyRate"
@@ -275,6 +285,7 @@ export function WorkOrderServiceEditSheet({
                 name="estimatedPriceRate"
                 label={t('work_orders.services.field.est_price')}
                 id="wos-est-price"
+                readOnly
               />
               <NumericField
                 name="actualPriceRate"
