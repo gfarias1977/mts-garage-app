@@ -89,7 +89,7 @@ export function WorkOrderServiceSparePartEditSheet({
           form.reset({
             description: result.data.description,
             cost: result.data.cost,
-            incrementalPercentage: result.data.incrementalPercentage ?? '0',
+            incrementalPercentage: (result.data.incrementalPercentage ?? '0') as typeof INCREMENTAL_PERCENTAGE_VALUES[number],
             adicionalCost: result.data.adicionalCost,
             totalCost: result.data.totalCost,
             status: result.data.status,
