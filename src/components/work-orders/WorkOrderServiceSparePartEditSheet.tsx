@@ -27,12 +27,14 @@ const STATUS_LABELS: Record<string, string> = { A: 'Activo', I: 'Inactivo' };
 
 const numericFieldRegex = /^\d+(\.\d{1,2})?$/;
 
+const INCREMENTAL_PERCENTAGE_VALUES = ['0','5','10','15','20','25','30','35','40','45','50','55','60','65','70','75','80','85','90','95','100'] as const;
+
 const INCREMENTAL_OPTIONS = Array.from({ length: 21 }, (_, i) => String(i * 5));
 
 const schema = z.object({
   description: z.string().min(1).max(255),
   cost: z.string().min(1).regex(numericFieldRegex, 'Ingrese un costo válido (ej: 1500.00)'),
-  incrementalPercentage: z.string().min(1),
+  incrementalPercentage: z.enum(INCREMENTAL_PERCENTAGE_VALUES),
   adicionalCost: z.string().regex(numericFieldRegex, 'Ingrese un costo adicional válido (ej: 100.00)'),
   totalCost: z.string().regex(numericFieldRegex, 'Ingrese un costo total válido (ej: 1600.00)'),
   status: z.string().min(1).max(1),
