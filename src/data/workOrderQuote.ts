@@ -81,7 +81,7 @@ export async function getWorkOrderQuoteData(workOrderId: bigint): Promise<WorkOr
 
   return {
     workOrderId: workOrder.id.toString(),
-    workOrderCode: workOrder.code,
+    workOrderCode: workOrder.code ?? '',
     vehiclePlate: workOrder.vehiclePlate,
     createdAt: workOrder.createdAt,
     createdBy: workOrder.createdBy,

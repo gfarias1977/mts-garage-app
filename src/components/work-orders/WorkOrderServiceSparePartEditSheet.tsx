@@ -173,13 +173,11 @@ export function WorkOrderServiceSparePartEditSheet({
               <Label htmlFor="sspr-incremental-pct">{t('work_orders.spare_parts.field.incremental_percentage')}</Label>
               <Select
                 value={form.watch('incrementalPercentage')}
-                onValueChange={(v) => form.setValue('incrementalPercentage', v, { shouldValidate: true })}
+                onValueChange={(v) => form.setValue('incrementalPercentage', (v ?? '0') as typeof INCREMENTAL_PERCENTAGE_VALUES[number], { shouldValidate: true })}
               >
                 <SelectTrigger id="sspr-incremental-pct" className="w-full">
                   <SelectValue placeholder="—">
-                    {form.watch('incrementalPercentage') !== ''
-                      ? `${form.watch('incrementalPercentage')}%`
-                      : undefined}
+                    {`${form.watch('incrementalPercentage')}%`}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>

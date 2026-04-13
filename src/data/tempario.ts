@@ -176,7 +176,7 @@ function mapRow(row: {
   sparePartId: bigint | null;
   fecha: Date | null;
   mes: number | null;
-  ot: string;
+  ot: string | null;
   aprobacion: string;
   aprobacionDesc: string | null;
   patente: string;
@@ -197,7 +197,7 @@ function mapRow(row: {
     sparePartId: row.sparePartId != null ? String(row.sparePartId) : null,
     fecha: row.fecha,
     mes: row.mes,
-    ot: row.ot,
+    ot: row.ot ?? '',
     aprobacion: row.aprobacion,
     aprobacionDesc: row.aprobacionDesc,
     patente: row.patente,

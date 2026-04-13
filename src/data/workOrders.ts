@@ -135,7 +135,7 @@ export async function getWorkOrders(params: {
   return {
     rows: rows.map((row) => ({
       id: row.id.toString(),
-      code: row.code,
+      code: row.code ?? '',
       clientName: row.clientName ?? '',
       mechanicName: row.mechanicName ?? null,
       vehiclePlate: row.vehiclePlate,
@@ -184,7 +184,7 @@ export async function getWorkOrderById(
   const row = rows[0];
   return {
     id: row.id.toString(),
-    code: row.code,
+    code: row.code ?? '',
     clientId: row.clientId,
     clientName: row.clientName ?? '',
     mechanicId: row.mechanicId ?? null,
